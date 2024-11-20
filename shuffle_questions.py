@@ -17,6 +17,17 @@ def read_csv_table(csv_path):
         print(f"Warning: Unable to read CSV file '{csv_path}'.", file=sys.stderr)
         return None
 
+def read_code_file(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        print(f"Warning: Code file '{file_path}' not found.", file=sys.stderr)
+        return None
+    except IOError:
+        print(f"Warning: Unable to read code file '{file_path}'.", file=sys.stderr)
+        return None
+
 def format_table_data(table_data):
     if not table_data:
         return ""
@@ -27,6 +38,14 @@ def format_table_data(table_data):
         formatted_rows.append(f'        ({formatted_row})')
     
     return '      table: (\n' + ',\n'.join(formatted_rows) + '\n      ),'
+
+def format_code_data(code_content, language):
+    if not code_content:
+        return ""
+    # Escape newlines and quotes in the code content
+    escaped_content = code_content.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+    return f'      code: (\n        content: "{escaped_content}",\n        lang: "{language}"\n      ),'
+
 
 def escape_quotes(text):
     return text.replace('"', '\\"').replace('\\t','\\\\t').replace('\\n','\\\\n').replace('\\r','\\\\r').replace('(','\(').replace(')','\)').replace('*','\*')
@@ -47,7 +66,7 @@ def shuffle_questions_and_choices(content, myseed, output_base):
     # Create output filenames
     questions_file = f"{output_base}-{myseed}.typ"
     answers_file = f"{output_base}-{myseed}-answers.typ"
-    
+
     # Split the content into individual questions
     questions = re.split(r'\n\s*\n', content.strip())
 
@@ -63,18 +82,18 @@ def shuffle_questions_and_choices(content, myseed, output_base):
 
         for question in questions:
             lines = question.strip().split('\n')
-            
+
             prompt = escape_quotes(lines[0].replace("Question: ", "").strip())
             if prompt.startswith("#"):
                 continue
-                
+
             current_line_idx = 1
             image_info = None
             table_info = None
-            
+            code_info = None
             while current_line_idx < len(lines):
                 current_line = lines[current_line_idx].strip()
-                
+
                 if current_line.startswith("image:"):
                     image_parts = current_line.replace("image:", "").strip().split(",")
                     image_path = image_parts[0].strip()
@@ -87,9 +106,17 @@ def shuffle_questions_and_choices(content, myseed, output_base):
                     if table_data:
                         table_info = format_table_data(table_data)
                     current_line_idx += 1
+                elif current_line.startswith("code:"):
+                    code_parts = current_line.replace("code:", "").strip().split(",")
+                    code_path = code_parts[0].strip()
+                    code_lang = code_parts[1].strip() if len(code_parts) > 1 else "text"
+                    code_content = read_code_file(code_path)
+                    if code_content:
+                        code_info = format_code_data(code_content, code_lang)
+                    current_line_idx += 1
                 else:
                     break
-            
+
             # Get the options and track correct answer
             options = []
             options_with_asterisk = []
@@ -97,11 +124,11 @@ def shuffle_questions_and_choices(content, myseed, output_base):
                 # be careful about paranthesis in the option text
                 option_text = option.split(') ',1)[1].strip()
                 options.append(option_text)
-            
+
             # Create a shuffled version for the questions file
             shuffled_options = options.copy()
             random.shuffle(shuffled_options)
-            
+
             # Write question without answers (shuffled, no asterisks)
             qf.write(f'    (\n')
             qf.write(f'      prompt: "{prompt}",\n')
@@ -109,6 +136,8 @@ def shuffle_questions_and_choices(content, myseed, output_base):
                 qf.write(f'{image_info}\n')
             if table_info:
                 qf.write(f'{table_info}\n')
+            if code_info:
+                qf.write(f'{code_info}\n')
             qf.write(f'      options: {format_tuple_with_double_quotes_noasterisk(shuffled_options)},\n')
             qf.write(f'    ),\n')
             
@@ -119,6 +148,8 @@ def shuffle_questions_and_choices(content, myseed, output_base):
                 af.write(f'{image_info}\n')
             if table_info:
                 af.write(f'{table_info}\n')
+            if code_info:
+                af.write(f'{code_info}\n')
             af.write(f'      options: {format_tuple_with_double_quotes(shuffled_options)},\n')
             af.write(f'    ),\n')
         

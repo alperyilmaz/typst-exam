@@ -66,7 +66,8 @@
       *#(index + 1). #eval(question.at("prompt"),mode:"markup")*
       
       #if "image" in question {
-        block(align(center)[
+        //block(align(center)[
+        box(width: 100%, align(center)[
           #image(question.at("image").path, width: question.at("image").width)
         ])
       }
@@ -79,11 +80,19 @@
           #create_table(table-data, table-font-size)
         ])
       }
+
+      #if "code" in question {
+        let code-data = question.at("code")
+        block(width: 100%, inset: (x: 2em))[
+          #raw(code-data.content, lang: code-data.lang)
+        ]
+      }
       #v(0.5em)
       #layout-options(question.at("options"))
       #v(1em)
     ]
   }
+
 
   // Function to insert a single column break at a specified position
   let insert_single_colbreak(blocks, position) = {

@@ -23,3 +23,10 @@ C) cartesian
 D) galileo
 E) euler
 
+Question: What will be the output of this Python code?
+code:hello.py,python
+A) Hello, World
+B) Hello Hello
+C) Hello, World!+
+D) World, Hello! 
+E) None of these
