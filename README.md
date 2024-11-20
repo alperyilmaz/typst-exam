@@ -37,7 +37,7 @@ E) option5
 
 In order to shuffle the questions, run the Python script. Please provide a seed number for random shuffling. This will help you generating the same shuffle with same seed number.
 
-```python
+```
 python shuffle_questions.py sample_questions.md 1
 ```
 
@@ -45,4 +45,16 @@ Then you can compile the questions with the exam template. `booklet` info is pri
 
 ```
 typst c main.typ --input booklet=A --input questions=sample_questions-1.typ test.pdf
+```
+
+You can print the answer sheet with the following command:
+```
+typst c main.typ --input booklet=A --input questions=sample_questions-1-answers.typ test-answers.pdf
+```
+
+If you wish to prepare another booklet, then you can shuffle with different seed and then compile the output
+
+```
+python shuffle_questions.py sample_questions.md 2
+typst c main.typ --input booklet=B --input questions=sample_questions-2.typ test_B.pdf
 ```

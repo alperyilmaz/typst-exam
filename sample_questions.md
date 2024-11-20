@@ -16,10 +16,10 @@ C) Image editing
 D) Typesetting+
 E) All of the other options
 
-Question: here's a formula $ a^2 + b^2 = c^2 $
-A) summation
-B) product
-C) integral
-D) derivative
-E) logaritm
+Question: Who is this equation named after $ a^2 + b^2 = c^2 $
+A) euclid
+B) pythagoras+
+C) cartesian
+D) galileo
+E) euler
 
