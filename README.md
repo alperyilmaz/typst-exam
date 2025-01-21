@@ -1,4 +1,4 @@
-# Multiple choice exam sheet wirh typst
+# Multiple choice exam sheet with typst
 
 Please prepare your questions in markdown format in the following format:
 
