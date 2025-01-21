@@ -48,7 +48,9 @@ def format_code_data(code_content, language):
 
 
 def escape_quotes(text):
-    return text.replace('"', '\\"').replace('\\t','\\\\t').replace('\\n','\\\\n').replace('\\r','\\\\r').replace('(','\(').replace(')','\)').replace('*','\*')
+    # no need for escaping  parenthesis  .replace('(','\(').replace(')','\)')
+    # might not need escaping newline  replace('\\n','\\\\n')
+    return text.replace('"', '\\"').replace('\\t','\\\\t').replace('\\n','\\\\n').replace('\\r','\\\\r').replace('*','\*')
 
 def format_tuple_with_double_quotes(items):
     formatted_items = [f'"{escape_quotes(item)}"' for item in items]
@@ -122,9 +124,15 @@ def shuffle_questions_and_choices(content, myseed, output_base):
             options_with_asterisk = []
             for option in lines[current_line_idx:]:
                 # be careful about paranthesis in the option text
-                option_text = option.split(') ',1)[1].strip()
-                options.append(option_text)
-
+                try:
+                    #option_text = option.split(') ',1)[1].strip()
+                    option_text = re.sub(r'^[A-Fa-f][\)\.]\s*', '', option).strip()
+                    options.append(option_text)
+                except(IndexError, AttributeError) as e:
+                    print(f"Error at line index: {current_line_idx}")
+                    print(f"Error details: {str(e)}")
+                    print(f"Problematic input: {option}")
+                    
             # Create a shuffled version for the questions file
             shuffled_options = options.copy()
             random.shuffle(shuffled_options)
@@ -182,3 +190,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
