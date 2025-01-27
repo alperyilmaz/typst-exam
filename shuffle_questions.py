@@ -50,7 +50,7 @@ def format_code_data(code_content, language):
 def escape_quotes(text):
     # no need for escaping  parenthesis  .replace('(','\(').replace(')','\)')
     # might not need escaping newline  replace('\\n','\\\\n')
-    return text.replace('"', '\\"').replace('\\t','\\\\t').replace('\\n','\\\\n').replace('\\r','\\\\r').replace('*','\*')
+    return text.replace('"', '\\"').replace('\\t','\\\\t').replace('\\n','\\\\n').replace('\\r','\\\\r').replace('*','\\*')
 
 def format_tuple_with_double_quotes(items):
     formatted_items = [f'"{escape_quotes(item)}"' for item in items]
